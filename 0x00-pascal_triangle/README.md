@@ -60,7 +60,5 @@ def pascal_triangle(n):
 - The code must follow PEP 8 style guidelines.
 
 ## Author
-- **Fatima Haruna Imam** - [GitHub Profile](https://github.com/your-username)
+- **Fatima Haruna Imam** - [GitHub Profile](https://github.com/FatimaHarunaImam)
 ```
-
-You can replace `yourusername` with your actual GitHub username and make sure the file paths match your project structure.
