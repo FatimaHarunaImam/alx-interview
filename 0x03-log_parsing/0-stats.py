@@ -2,47 +2,49 @@
 import sys
 import signal
 
-# Initialize metrics
+# Initialize global variables
 total_size = 0
 status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
 line_count = 0
 
 def print_stats():
-    """Print the statistics (total file size and count of each status code)."""
+    """Print the accumulated statistics."""
     print(f"File size: {total_size}")
-    for code in sorted(status_codes.keys()):
+    for code in sorted(status_codes):
         if status_codes[code] > 0:
             print(f"{code}: {status_codes[code]}")
 
 def signal_handler(sig, frame):
-    """Handle keyboard interruption (CTRL + C) to print stats and exit."""
+    """Handle keyboard interrupt (CTRL + C) to print stats."""
     print_stats()
     sys.exit(0)
 
-# Set up the signal handler for keyboard interruption
+# Set up signal handler for graceful exit on CTRL + C
 signal.signal(signal.SIGINT, signal_handler)
 
-# Read stdin line by line
 try:
+    # Read input line by line
     for line in sys.stdin:
         try:
-            # Split the line and extract fields
+            # Split the line into components
             parts = line.split()
+            
+            # Check if the line matches the required format
             if len(parts) < 7:
                 continue
 
-            # Extract IP address (not used), date, request (not used), status code, and file size
-            ip, _, _, date, request, status_code, file_size = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]
+            # Extract status code and file size (the last two parts)
+            status_code = int(parts[-2])
+            file_size = int(parts[-1])
 
-            # Ensure valid status code and file size
-            status_code = int(status_code)
-            file_size = int(file_size)
-
-            # Update the metrics
+            # Accumulate file size
             total_size += file_size
+
+            # Update the status code count if it's one of the expected ones
             if status_code in status_codes:
                 status_codes[status_code] += 1
 
+            # Increment line counter
             line_count += 1
 
             # Print stats after every 10 lines
@@ -50,10 +52,10 @@ try:
                 print_stats()
 
         except (ValueError, IndexError):
-            # Skip lines that don't match the expected format
+            # Skip lines that don't conform to the expected format
             continue
 
 except KeyboardInterrupt:
-    # Handle manual interruption (CTRL + C)
+    # Handle CTRL + C by printing the stats before exiting
     print_stats()
     sys.exit(0)
